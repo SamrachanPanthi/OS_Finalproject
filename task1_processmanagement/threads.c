@@ -1,61 +1,55 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <semaphore.h>
-#include <unistd.h>
 
-#define THREADS 3
+int *completedOrders;
 
-int *shared;
-pthread_mutex_t lock;
-sem_t sem;
-
-// Worker thread
-void* task(void* arg)
+void *orderThread(void *arg)
 {
-    int id = *(int*)arg;
+    printf("Order Thread Started.\n");
+    return NULL;
+}
 
-    sem_wait(&sem);
+void *kitchenThread(void *arg)
+{
+    printf("Kitchen Thread Started.\n");
+    return NULL;
+}
 
-    printf("Thread %d is running\n", id);
-
-    sem_post(&sem);
-
+void *billingThread(void *arg)
+{
+    printf("Billing Thread Started.\n");
     return NULL;
 }
 
 int main()
 {
-    pthread_t t[THREADS];
-    int id[THREADS] = {1,2,3};
+    pthread_t t1,t2,t3;
 
-    shared = (int*)malloc(sizeof(int));
+    completedOrders=(int *)malloc(sizeof(int));
 
-    if(shared == NULL)
+    if(completedOrders==NULL)
     {
-        printf("Memory allocation failed!\n");
+        printf("Memory Allocation Failed!\n");
         return 1;
     }
 
-    *shared = 0;
+    completedOrders=0;
 
-    printf("Memory allocated successfully.\n");
-    printf("Shared value = %d\n", *shared);
+    printf("Restaurant Order Management System\n\n");
 
-    sem_init(&sem,0,2);
+    pthread_create(&t1,NULL,orderThread,NULL);
+    pthread_create(&t2,NULL,kitchenThread,NULL);
+    pthread_create(&t3,NULL,billingThread,NULL);
 
-    for(int i=0;i<THREADS;i++)
-    {
-        pthread_create(&t[i],NULL,task,&id[i]);
-    }
+    pthread_join(t1,NULL);
+    pthread_join(t2,NULL);
+    pthread_join(t3,NULL);
 
-    for(int i=0;i<THREADS;i++)
-    {
-        pthread_join(t[i],NULL);
-    }
+    printf("\nCompleted Orders = %d\n",*completedOrders);
 
-    sem_destroy(&sem);
-    free(shared);
+    free(completedOrders);
 
     return 0;
 }
+
