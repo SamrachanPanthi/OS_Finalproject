@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -34,7 +35,7 @@ int main()
         return 1;
     }
 
-    completedOrders=0;
+    *completedOrders=0;
 
     printf("Restaurant Order Management System\n\n");
 
