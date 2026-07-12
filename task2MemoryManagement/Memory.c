@@ -22,6 +22,59 @@ void displayFrames(int frames[])
         }
     }
 }
+void simulateFIFO()
+{
+    int frames[FRAME_COUNT];
+
+    int hits = 0;
+    int faults = 0;
+
+    int pointer = 0;
+
+    for (int i = 0; i < FRAME_COUNT; i++)
+    {
+        frames[i] = -1;
+    }
+
+    printf("\n===== FIFO =====\n");
+
+    for (int i = 0; i < TOTAL_REQUESTS; i++)
+    {
+        int found = 0;
+
+        for (int j = 0; j < FRAME_COUNT; j++)
+        {
+            if (frames[j] == videoPages[i])
+            {
+                found = 1;
+                hits++;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            faults++;
+
+            frames[pointer] = videoPages[i];
+
+            pointer = (pointer + 1) % FRAME_COUNT;
+        }
+
+        printf("Segment %d -> ", videoPages[i]);
+
+        displayFrames(frames);
+
+        if (found)
+        {
+            printf(" Hit\n");
+        }
+        else
+        {
+            printf(" Fault\n");
+        }
+    }
+}
 int main()
 {
     printf(" VIDEO STREAMING MEMORY SIMULATOR\n");
