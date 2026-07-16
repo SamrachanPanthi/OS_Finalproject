@@ -149,30 +149,42 @@ int main()
 
     do
     {
-printf("\n1. Create File");
-printf("\n2. Read File");
-printf("\n3. Write File");
-printf("\n4. Delete File");
-printf("\n5. Exit");}
-printf("\nEnter choice: ");
+        printf("\n1. Create File");
+        printf("\n2. Read File");
+        printf("\n3. Write File");
+        printf("\n4. Delete File");
+        printf("\n5. Exit");
+
+        printf("\nEnter choice: ");
         scanf("%d", &choice);
+
+        switch (choice)
         {
-        case 1:
-            createFile();
-            break;
+            case 1:
+                createFile();
+                break;
 
-        case 2:
-            deleteFile();
-            break;
+            case 2:
+                readFile();
+                break;
 
-        case 3:
-            break;
+            case 3:
+                writeFile();
+                break;
 
-        default:
-            printf("\nInvalid choice!\n");
+            case 4:
+                deleteFile();
+                break;
+
+            case 5:
+                printf("\nExiting...\n");
+                break;
+
+            default:
+                printf("\nInvalid choice!\n");
         }
 
-    } while (choice != 3);
+    } while (choice != 5);
 
     return 0;
 }
