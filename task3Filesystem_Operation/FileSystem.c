@@ -9,7 +9,7 @@
 char username[] = "admin";
 char password[] = "gamecore";
 
-// ================= FILE STRUCTURE =================
+//  FILE STRUCTURE 
 
 struct GameFile
 {
@@ -36,7 +36,7 @@ struct GameFile files[MAX_FILES];
 
 int totalFiles = 0;
 
-// ================= AUDIT LOG =================
+//  AUDIT LOG 
 
 void auditLog(char user[], char filename[],
               char operation[], char status[])
@@ -62,7 +62,7 @@ void auditLog(char user[], char filename[],
     fclose(log);
 }
 
-// ================= ENCRYPTION =================
+// ENCRYPTION 
 
 void encrypt(char text[])
 {
@@ -84,14 +84,14 @@ void decrypt(char text[])
     }
 }
 
-// ================= LOGIN =================
+//  LOGIN 
 
 int login()
 {
     char user[30];
     char pass[30];
 
-    printf("\n===== GAMECORE SECURE FILE SYSTEM =====\n");
+    printf("\n GAMECORE SECURE FILE SYSTEM \n");
 
     printf("Username: ");
     scanf("%29s", user);
@@ -116,7 +116,7 @@ int login()
     return 0;
 }
 
-// ================= CREATE FILE =================
+//  CREATE FILE 
 
 void createFile()
 {
@@ -164,7 +164,7 @@ void createFile()
     printf("File created successfully.\n");
 }
 
-// ================= READ FILE =================
+// READ FILE 
 
 void readFile()
 {
@@ -199,7 +199,7 @@ void readFile()
 
             decrypt(temp);
 
-            printf("\n===== FILE CONTENT =====\n");
+            printf("\n FILE CONTENT\n");
 
             printf("%s\n", temp);
 
@@ -218,7 +218,7 @@ void readFile()
     }
 }
 
-// ================= WRITE FILE =================
+//  WRITE FILE 
 
 void writeFile()
 {
@@ -274,7 +274,7 @@ void writeFile()
     }
 }
 
-// ================= DELETE FILE =================
+//  DELETE FILE 
 
 void deleteFile()
 {
@@ -315,11 +315,11 @@ void deleteFile()
     }
 }
 
-// ================= SHOW PERMISSIONS =================
+//  SHOW PERMISSIONS 
 
 void showPermissions()
 {
-    printf("\n===== FILE PERMISSIONS =====\n");
+    printf("\n FILE PERMISSIONS \n");
 
     if (totalFiles == 0)
     {
@@ -346,11 +346,11 @@ void showPermissions()
         printf("Write   : %d\n", files[i].othersWrite);
         printf("Execute : %d\n", files[i].othersExecute);
 
-        printf("\n--------------------------\n");
+        printf("\n\n");
     }
 }
 
-// ================= MAIN =================
+//  MAIN 
 
 int main()
 {
