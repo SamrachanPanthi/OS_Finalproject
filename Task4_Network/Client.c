@@ -1,7 +1,3 @@
-/*
-    GameCore Multiplayer Client
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,8 +17,8 @@ int main()
     char password[50];
 
     char loginInfo[100];
-    char reply[BUFFER_SIZE];
     char message[BUFFER_SIZE];
+    char reply[BUFFER_SIZE];
 
     socketFD = socket(
         AF_INET,
@@ -87,35 +83,52 @@ int main()
 
     printf("\nServer: %s\n", reply);
 
+    if (strcmp(reply, "Access Denied") == 0)
+    {
+        close(socketFD);
+
+        return 1;
+    }
+
     getchar();
 
-    printf("\nEnter message: ");
+    while (1)
+    {
+        printf("\nEnter Message (QUIT to exit): ");
 
-    fgets(
-        message,
-        sizeof(message),
-        stdin
-    );
+        fgets(
+            message,
+            sizeof(message),
+            stdin
+        );
 
-    message[strcspn(message, "\n")] = '\0';
+        message[strcspn(message, "\n")] = '\0';
 
-    send(
-        socketFD,
-        message,
-        strlen(message) + 1,
-        0
-    );
+        send(
+            socketFD,
+            message,
+            strlen(message) + 1,
+            0
+        );
 
-    recv(
-        socketFD,
-        reply,
-        sizeof(reply) - 1,
-        0
-    );
+        recv(
+            socketFD,
+            reply,
+            sizeof(reply) - 1,
+            0
+        );
 
-    printf("Server Response: %s\n", reply);
+        printf("Server Response: %s\n", reply);
+
+        if (strcmp(message, "QUIT") == 0)
+        {
+            break;
+        }
+    }
 
     close(socketFD);
+
+    printf("\nDisconnected from server.\n");
 
     return 0;
 }
