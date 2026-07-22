@@ -1,12 +1,3 @@
-/*
-    GameCore Operating System
-
-    Features:
-    - TCP socket communication
-    - Player connection handling
-    - Player authentication
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,6 +40,7 @@ void authenticatePlayer(int clientSocket)
         password
     );
 
+<<<<<<< HEAD
     printf(
         "\nUsername: %s\n",
         username
@@ -61,6 +53,14 @@ void authenticatePlayer(int clientSocket)
 
     if (
         strcmp(username, "player") == 0 &&
+=======
+    printf("\nUsername: %s\n", username);
+
+    printf("Password: %s\n", password);
+
+    if (
+        strcmp(username, "admin") == 0 &&
+>>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
         strcmp(password, "gamecore123") == 0
     )
     {
@@ -78,7 +78,10 @@ void authenticatePlayer(int clientSocket)
             "Player authenticated.\n"
         );
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
     else
     {
         char fail[] =
@@ -95,6 +98,11 @@ void authenticatePlayer(int clientSocket)
             "Authentication failed.\n"
         );
     }
+<<<<<<< HEAD
+=======
+
+    close(clientSocket);
+>>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
 }
 
 int main()
@@ -156,7 +164,11 @@ int main()
     }
 
     printf(
+<<<<<<< HEAD
         "Server running on port %d\n",
+=======
+        "Server bound to port %d.\n",
+>>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
         PORT
     );
 
@@ -198,12 +210,17 @@ int main()
         }
 
         printf(
+<<<<<<< HEAD
             "\nPlayer connected.\n"
+=======
+            "Player connected.\n"
+>>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
         );
 
         authenticatePlayer(
             clientSocket
         );
+<<<<<<< HEAD
 
         close(
             clientSocket
@@ -213,6 +230,11 @@ int main()
     close(
         serverSocket
     );
+=======
+    }
+
+    close(serverSocket);
+>>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
 
     return 0;
 }
