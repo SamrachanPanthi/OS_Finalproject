@@ -1,71 +1,90 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <unistd.h>
 
 #include <arpa/inet.h>
+#include <pthread.h>
 
 #define PORT 8080
+#define BUFFER_SIZE 256
 
-void authenticatePlayer(int clientSocket)
+
+void *clientHandler(void *socketPointer)
 {
-    char loginData[100];
+    int clientSocket = *(int *)socketPointer;
+
+    free(socketPointer);
+
+    char buffer[BUFFER_SIZE];
 
     char username[50];
-
     char password[50];
 
-    int received = recv(
+    char loginData[100];
+
+
+    /* Receive login information */
+
+    int loginReceived = recv(
         clientSocket,
         loginData,
         sizeof(loginData) - 1,
         0
     );
 
-    if (received <= 0)
+    if (loginReceived <= 0)
     {
         printf("Login data not received.\n");
 
         close(clientSocket);
 
-        return;
+        pthread_exit(NULL);
     }
 
-    loginData[received] = '\0';
+    loginData[loginReceived] = '\0';
 
-    sscanf(
-        loginData,
-        "%[^:]:%s",
-        username,
-        password
-    );
 
-<<<<<<< HEAD
-    printf(
-        "\nUsername: %s\n",
-        username
-    );
+    /* Extract username and password */
 
-    printf(
-        "Password: %s\n",
-        password
-    );
+    if (
+        sscanf(
+            loginData,
+            "%49[^:]:%49s",
+            username,
+            password
+        ) != 2
+    )
+    {
+        char invalid[] = "Invalid Login Format";
+
+        send(
+            clientSocket,
+            invalid,
+            strlen(invalid) + 1,
+            0
+        );
+
+        close(clientSocket);
+
+        pthread_exit(NULL);
+    }
+
+
+    printf("\n PLAYER CONNECTED \n");
+
+    printf("Username: %s\n", username);
+
+
+    /* Authentication */
 
     if (
         strcmp(username, "player") == 0 &&
-=======
-    printf("\nUsername: %s\n", username);
-
-    printf("Password: %s\n", password);
-
-    if (
-        strcmp(username, "admin") == 0 &&
->>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
         strcmp(password, "gamecore123") == 0
     )
     {
-        char success[] =
-            "Authentication Successful";
+        char success[] = "Authentication Successful";
 
         send(
             clientSocket,
@@ -74,18 +93,11 @@ void authenticatePlayer(int clientSocket)
             0
         );
 
-        printf(
-            "Player authenticated.\n"
-        );
+        printf("Player authenticated.\n");
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
     else
     {
-        char fail[] =
-            "Access Denied";
+        char fail[] = "Access Denied";
 
         send(
             clientSocket,
@@ -94,29 +106,173 @@ void authenticatePlayer(int clientSocket)
             0
         );
 
+        printf("Authentication failed.\n");
+
+        close(clientSocket);
+
+        pthread_exit(NULL);
+    }
+
+
+    /* Game communication loop */
+
+    while (1)
+    {
+        memset(
+            buffer,
+            0,
+            sizeof(buffer)
+        );
+
+        int received = recv(
+            clientSocket,
+            buffer,
+            sizeof(buffer) - 1,
+            0
+        );
+
+        if (received <= 0)
+        {
+            printf("Player disconnected.\n");
+
+            break;
+        }
+
+        buffer[received] = '\0';
+
         printf(
-            "Authentication failed.\n"
+            "Player Command: %s\n",
+            buffer
+        );
+
+        char response[BUFFER_SIZE];
+
+
+        /* Start game */
+
+        if (strcmp(buffer, "START_GAME") == 0)
+        {
+            strcpy(
+                response,
+                "Game Started Successfully"
+            );
+        }
+
+
+        /* Score update */
+
+        else if (
+            strncmp(
+                buffer,
+                "SCORE",
+                5
+            ) == 0
+        )
+        {
+            strcpy(
+                response,
+                "Score Updated"
+            );
+        }
+
+
+        /* Player status */
+
+        else if (
+            strcmp(
+                buffer,
+                "STATUS"
+            ) == 0
+        )
+        {
+            strcpy(
+                response,
+                "Player Status: Active | Health: 100"
+            );
+        }
+
+
+        /* Chat message */
+
+        else if (
+            strncmp(
+                buffer,
+                "CHAT",
+                4
+            ) == 0
+        )
+        {
+            strcpy(
+                response,
+                "Message Delivered To Players"
+            );
+        }
+
+
+        /* Disconnect */
+
+        else if (
+            strcmp(
+                buffer,
+                "QUIT"
+            ) == 0
+        )
+        {
+            strcpy(
+                response,
+                "Disconnected From GameCore Server"
+            );
+
+            send(
+                clientSocket,
+                response,
+                strlen(response) + 1,
+                0
+            );
+
+            break;
+        }
+
+
+        /* Invalid command */
+
+        else
+        {
+            strcpy(
+                response,
+                "Invalid Game Command"
+            );
+        }
+
+
+        send(
+            clientSocket,
+            response,
+            strlen(response) + 1,
+            0
         );
     }
-<<<<<<< HEAD
-=======
+
 
     close(clientSocket);
->>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
+
+    pthread_exit(NULL);
 }
+
 
 int main()
 {
     int serverSocket;
-
     int clientSocket;
 
     struct sockaddr_in serverAddress;
-
     struct sockaddr_in clientAddress;
 
     socklen_t clientLength =
         sizeof(clientAddress);
+
+
+    /* Create socket */
 
     serverSocket = socket(
         AF_INET,
@@ -126,9 +282,7 @@ int main()
 
     if (serverSocket < 0)
     {
-        printf(
-            "Socket creation failed.\n"
-        );
+        printf("Socket creation failed.\n");
 
         return 1;
     }
@@ -136,6 +290,9 @@ int main()
     printf(
         "GameCore server socket created.\n"
     );
+
+
+    /* Configure server */
 
     serverAddress.sin_family =
         AF_INET;
@@ -146,6 +303,9 @@ int main()
     serverAddress.sin_port =
         htons(PORT);
 
+
+    /* Bind */
+
     if (
         bind(
             serverSocket,
@@ -154,9 +314,7 @@ int main()
         ) < 0
     )
     {
-        printf(
-            "Bind failed.\n"
-        );
+        printf("Bind failed.\n");
 
         close(serverSocket);
 
@@ -164,13 +322,12 @@ int main()
     }
 
     printf(
-<<<<<<< HEAD
         "Server running on port %d\n",
-=======
-        "Server bound to port %d.\n",
->>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
         PORT
     );
+
+
+    /* Listen */
 
     if (
         listen(
@@ -179,9 +336,7 @@ int main()
         ) < 0
     )
     {
-        printf(
-            "Listen failed.\n"
-        );
+        printf("Listen failed.\n");
 
         close(serverSocket);
 
@@ -191,6 +346,7 @@ int main()
     printf(
         "Waiting for players...\n"
     );
+
 
     while (1)
     {
@@ -210,31 +366,30 @@ int main()
         }
 
         printf(
-<<<<<<< HEAD
             "\nPlayer connected.\n"
-=======
-            "Player connected.\n"
->>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
         );
 
-        authenticatePlayer(
-            clientSocket
-        );
-<<<<<<< HEAD
 
-        close(
-            clientSocket
+        int *newSocket =
+            malloc(sizeof(int));
+
+        *newSocket = clientSocket;
+
+
+        pthread_t thread;
+
+        pthread_create(
+            &thread,
+            NULL,
+            clientHandler,
+            newSocket
         );
+
+        pthread_detach(thread);
     }
 
-    close(
-        serverSocket
-    );
-=======
-    }
 
     close(serverSocket);
->>>>>>> 3ecab9a34da08b57121ab34a32bba8cc4a343b24
 
     return 0;
 }
