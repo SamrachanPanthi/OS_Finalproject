@@ -234,13 +234,9 @@ int main()
     );
 
     printf(
-    );
-    printf(
         " Multiplayer Video Game Management System\n"
     );
 
-    printf(
-    );
 
     printf(
         "\nThread Execution\n"
